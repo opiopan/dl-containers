@@ -1,0 +1,88 @@
+ARG BASECONTAINER="__BASECONTAINER__"
+
+FROM ${BASECONTAINER}
+LABEL maintainer "opiopan@gmail.com"
+
+ARG PYTHON_VERSION="__PYTHON_VERSION__"
+ARG TF_VERSION="__TF_VERSION__"
+ARG CUPY_PKG="__CUPY_PKG__"
+ARG CUPY_VERSION="__CUPY_VERSION__"
+ARG CHAINER_VERSION="__CHAINER_VERSION__"
+ARG PYTORCH_VERSION="__PYTORCH_VERSION__"
+ARG TORCHVISION_VERSION="__TORCHVISION_VERSION__"
+ARG PYTORCH_WHLLIST="__PYTORCH_WHLLIST__"
+ARG PILLOW_VERSION="__PILLOW_VERSION__"
+
+#-----------------------------------------------------
+# install essentials
+#-----------------------------------------------------
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
+    apt-get install -y --no-install-recommends \
+    	curl \
+	git \
+	libffi-dev \
+	libssl-dev \
+	zlib1g-dev \
+	liblzma-dev \
+	libbz2-dev libreadline-dev libsqlite3-dev \
+	python3-tk tk-dev
+ENV DEBIAN_FRONTEND=
+
+#-----------------------------------------------------
+# install Python
+#-----------------------------------------------------
+RUN apt-get purge -y python* libpython* && \
+    git clone --depth=1 git://github.com/pyenv/pyenv.git .pyenv
+WORKDIR /
+ENV HOME  /
+ENV PYENV_ROOT /.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+RUN pyenv install ${PYTHON_VERSION} && \
+    pyenv global ${PYTHON_VERSION} && \
+    pyenv rehash && \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir setuptools
+
+#-----------------------------------------------------
+# install Tensorfolow & Keras
+#-----------------------------------------------------
+RUN pip3 install --no-cache-dir \
+    tensorflow-gpu${TF_VERSION} \
+    keras
+ENV TF_FORCE_GPU_ALLOW_GROWTH=true
+
+#-----------------------------------------------------
+# install CuPy
+#-----------------------------------------------------
+RUN pip install --no-cache-dir ${CUPY_PKG}${CUPY_VERSION}
+
+#-----------------------------------------------------
+# install Chainer
+#-----------------------------------------------------
+RUN pip install --no-cache-dir chainer${CHAINER_VERSION}
+
+#-----------------------------------------------------
+# install PyTorch
+#-----------------------------------------------------
+RUN pip install --no-cache-dir Pillow${PILLOW_VERSION} && \
+    pip install --no-cache-dir -f ${PYTORCH_WHLLIST} \
+    	torch${PYTORCH_VERSION} \
+    	torchvision${TORCHVISION_VERSION}
+
+#-----------------------------------------------------
+# install essential python libs for ML
+#-----------------------------------------------------
+RUN pip install --no-cache-dir \
+    	Pillow \
+	matplotlib \
+	tqdm \
+	h5py \
+	kaggle-cli \
+	gym
+
+#-----------------------------------------------------
+# clean up
+#-----------------------------------------------------
+RUN apt-get clean

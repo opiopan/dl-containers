@@ -1,0 +1,164 @@
+#!/usr/bin/env python
+import os
+import sys
+import json
+import shutil
+import subprocess
+
+THISDIR = os.path.dirname(__file__)
+CONFIG_FILE = os.path.join(THISDIR, 'Instances.json')
+DOCKERFILE_DIR = os.path.join(THISDIR, '../dockerfiles')
+
+class MakeRule:
+    def __init__(self):
+        self.tags = []
+
+    def add_tag(self, tag):
+        self.tags.append(tag)
+
+    def flush(self):
+        rulefile = os.path.join(DOCKERFILE_DIR, '.buildrule')
+        with open(rulefile, 'w') as f:
+            f.write('allimages: ' + ' '.join(self.tags) + '\n')
+            for tag in self.tags:
+                f.write(tag + ':\n')
+                f.write('\tdocker build -t opiopan/dlenv-core:{0} '
+                        'dockerfiles/{0}/core\n'.format(tag))
+                f.write('\tdocker build -t opiopan/dlenv-utils:{0} '
+                        'dockerfiles/{0}/utils\n'.format(tag))
+                f.write('\tdocker build -t opiopan/dlenv:{0} '
+                        'dockerfiles/{0}/user\n'.format(tag))
+
+def m4options_common(config):
+    element = ''
+    opts = []
+    try:
+        element = 'python/version'
+        opts.append('-D__PYTHON_VERSION__=' + config['python']['version'])
+        element = 'tensorflow/version'
+        opts.append('-D__TF_VERSION__===' + config['tensorflow']['version'])
+        element = 'chainer/version'
+        opts.append('-D__CHAINER_VERSION__===' + config['chainer']['version'])
+        element = 'pytorch/version'
+        opts.append('-D__PYTORCH_VERSION__===' + config['pytorch']['version'])
+        element = 'pytorch/whl-list'
+        opts.append('-D__PYTORCH_WHLLIST__=' + config['pytorch']['whl-list'])
+        element = 'torchvision/version'
+        opts.append('-D__TORCHVISION_VERSION__===' + \
+                    config['torchvision']['version'])
+        element = 'pillow/version'
+        opts.append('-D__PILLOW_VERSION__===' + config['pillow']['version'])
+        element = 'opencv/version'
+        opts.append('-D__OPENCV_VERSION__=' + config['opencv']['version'])
+        if 'options' in config['opencv']:
+            opts.append('-D__OPENCV_ADDITIONAL_OPTIONS__=' + \
+                        config['opencv']['options'])
+
+    except:
+        raise Exception('no {0} definition'.format(element))
+
+    return opts
+
+def m4options_cuda(config):
+    element = None
+    base = None
+    opts = m4options_common(config)
+    try:
+        element = 'cuda-container'
+        container = config[element]
+        element = 'cuda-version'
+        cuda_ver = container[element]
+        element = 'cudnn-version'
+        cudnn_ver = container[element]
+        element = 'ubuntu-version'
+        ubuntu_ver = container[element]
+        base = 'nvidia/cuda:{0}-cudnn{1}-devel-ubuntu{2}'.\
+               format(cuda_ver, cudnn_ver, ubuntu_ver)
+        element = 'cupy/package'
+        opts.append('-D__CUPY_PKG__=' + config['cupy']['package'])
+        element = 'cupy/version'
+        opts.append('-D__CUPY_VERSION__===' + config['cupy']['version'])
+        
+    except:
+        raise Exception('no {0} definition'.format(element))
+    
+    return base, opts
+
+def m4run(opts, in_file, out_file):
+    cmds = ['m4', '-P', '-G'] + opts + [in_file]
+    with open(out_file, 'w') as f:
+        subprocess.call(cmds, stdout=f)
+
+def gen_dockerfile(tag, envtype, base_container, m4_opts):
+    basedir = os.path.join(DOCKERFILE_DIR, tag)
+    coredir = os.path.join(basedir, 'core')
+    utilsdir = os.path.join(basedir, 'utils')
+    userdir = os.path.join(basedir, 'user')
+    archdir_in = os.path.join(THISDIR, envtype)
+    userdir_in = os.path.join(THISDIR, 'user')
+    core_in = os.path.join(archdir_in, 'Dockerfile.core')
+    core_out = os.path.join(coredir, 'Dockerfile') 
+    utils_in = os.path.join(archdir_in, 'Dockerfile.utils')
+    utils_out = os.path.join(utilsdir, 'Dockerfile') 
+    user_in = os.path.join(userdir_in, 'Dockerfile.user')
+    user_out = os.path.join(userdir, 'Dockerfile') 
+    user_entrypoint_in = os.path.join(userdir_in, 'entrypoint')
+    user_entrypoint_out = os.path.join(userdir, 'entrypoint')
+
+    os.mkdir(basedir)
+    os.mkdir(coredir)
+    os.mkdir(utilsdir)
+    os.mkdir(userdir)
+
+    m4run(['-D__BASECONTAINER__=' + base_container] + opts,
+          core_in, core_out)
+    parent = 'opiopan/dlenv-core:' + tag
+    m4run(['-D__BASECONTAINER__=' + parent] + opts,
+          utils_in, utils_out)
+    parent = 'opiopan/dlenv-utils:' + tag
+    m4run(['-D__BASECONTAINER__=' + parent] + opts,
+          user_in, user_out)
+    os.link(user_entrypoint_in, user_entrypoint_out)
+    
+
+def print_done_msg(name, errmsg=None):
+    if sys.stdout.isatty():
+        OKC = '\033[96m'
+        NGC = '\033[93m'
+        ENDC = '\033[0m'
+    else:
+        OKC = ''
+        NGC = ''
+        ENDC = ''
+    if errmsg is None:
+        msg = 'done'
+        BEGINC = OKC
+    else:
+        msg = 'skip (' + errmsg + ')'
+        BEGINC = NGC
+    
+    print('{0} : {1}{2}{3}'.format(tag, BEGINC, msg, ENDC))
+
+if __name__ == '__main__':
+    with open(CONFIG_FILE) as f:
+        config = json.load(f)
+        shutil.rmtree(DOCKERFILE_DIR)
+        os.mkdir(DOCKERFILE_DIR)
+        rule = MakeRule()
+        for tag in config:
+            instance = config[tag]
+            if 'type' in instance :
+                envtype = instance['type']
+                try:
+                    if envtype == 'cuda':
+                        base, opts = m4options_cuda(instance)
+                        err = gen_dockerfile(tag, envtype, base, opts)
+                        rule.add_tag(tag)
+                        print_done_msg(tag)
+                    else:
+                        print_done_msg(tag, 'unsupported container type')
+                except Exception as e:
+                    print_done_msg(tag, e.args[0])
+            else:
+                print_done_msg(tag, '"type" parameter is not found')
+        rule.flush()
