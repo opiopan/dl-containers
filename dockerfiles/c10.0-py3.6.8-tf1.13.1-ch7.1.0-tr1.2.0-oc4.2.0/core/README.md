@@ -1,17 +1,17 @@
 dlenv-core
 ====
 
-dlenv-core is a container image that contains several midleware for deel learning.<br>
+dlenv-core is a container image that contains several middlewares for deep learning.<br>
 This image is the base of [dlenv-utils](https://hub.docker.com/r/opiopan/dlenv-utils) containing additional tools, and the base of [dlenv](https://hub.docker.com/r/opiopan/dlenv) optimzed for non-root user using.<br>
 I strongly recommend you to use [dlenv](https://hub.docker.com/opiopan/dlenv) instead.
 
 Dockerfile for this image is automaticaly generated from a template file and a rulefile. Refer [this github repository](https://github.com/opiopan/dl-containers) for details.
 
 ## Tag Naming Convention
-There are many tools and midlewares for deep learning in the workld, and they are updated without backword compatibility sometimes.
+There are many tools and middlewares for deep learning in the workld, and they are updated without backword compatibility sometimes.
 This is the major motivation to use container for deep learning environment.<br>
-dlenv-core provides several variation of images as combination of some version of each tool and midleware.
-Tag name of each image is very long since tag indicates version of each tool and midleware.<br>
+dlenv-core provides several variation of images as combination of some version of each tool and middleware.
+Tag name of each image is very long since tag indicates version of each tool and middleware.<br>
 In this section, naming rule for tag is explained.
 
 Tags are roughly divided into two types as below examples.

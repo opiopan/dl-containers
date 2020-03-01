@@ -1,14 +1,14 @@
 dlenv
 ====
 
-dlenv is a container image that contains several midleware for deel learning.<br>
+dlenv is a container image that contains several middleware for deep learning.<br>
 Dockerfile for this image is automaticaly generated from a template file and a rulefile. Refer [this github repository](https://github.com/opiopan/dl-containers) for details.
 
 ## Tag Naming Convention
-There are many tools and midlewares for deep learning in the workld, and they are updated without backword compatibility sometimes.
+There are many tools and middlewares for deep learning in the workld, and they are updated without backword compatibility sometimes.
 This is the major motivation to use container for deep learning environment.<br>
-dlenv-utils provides several variation of images as combination of some version of each tool and midleware.
-Tag name of each image is very long since tag indicates version of each tool and midleware.<br>
+dlenv-utils provides several variation of images as combination of some version of each tool and middleware.
+Tag name of each image is very long since tag indicates version of each tool and middleware.<br>
 In this section, naming rule for tag is explained.
 
 Tags are roughly divided into two types as below examples.
