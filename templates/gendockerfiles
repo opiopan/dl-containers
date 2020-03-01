@@ -105,6 +105,14 @@ def gen_dockerfile(tag, envtype, base_container, m4_opts):
     user_entrypoint_in = os.path.join(userdir_in, 'entrypoint')
     user_entrypoint_out = os.path.join(userdir, 'entrypoint')
 
+    docdir_in = os.path.join(THISDIR, 'docs')
+    core_doc_in = os.path.join(docdir_in, 'README.md.core')
+    core_doc_out = os.path.join(coredir, 'README.md') 
+    utils_doc_in = os.path.join(docdir_in, 'README.md.utils')
+    utils_doc_out = os.path.join(utilsdir, 'README.md') 
+    user_doc_in = os.path.join(docdir_in, 'README.md.user')
+    user_doc_out = os.path.join(userdir, 'README.md') 
+
     os.mkdir(basedir)
     os.mkdir(coredir)
     os.mkdir(utilsdir)
@@ -119,6 +127,9 @@ def gen_dockerfile(tag, envtype, base_container, m4_opts):
     m4run(['-D__BASECONTAINER__=' + parent] + opts,
           user_in, user_out)
     os.link(user_entrypoint_in, user_entrypoint_out)
+    os.link(core_doc_in, core_doc_out)
+    os.link(utils_doc_in, utils_doc_out)
+    os.link(user_doc_in, user_doc_out)
     
 
 def print_done_msg(name, errmsg=None):
