@@ -1,0 +1,197 @@
+#!/usr/bin/env python
+import sys
+import os
+import json
+from optparse import OptionParser, OptionGroup
+import yaml
+import subprocess
+
+IMAGENAME='opiopan/dlenv'
+
+class UserEnv:
+    def __init__(self):
+        if 'SUDO_USER' in os.environ:
+            self.via_sudo = True
+            self.user = os.getenv('SUDO_USER')
+            self.uid = os.getenv('SUDO_UID')
+            self.gid = os.getenv('SUDO_GID')
+            os.environ['HOME'] = os.path.expanduser('~' + self.user)
+        else:
+            self.via_sudo = False
+            self.user = os.getenv('USER')
+            self.uid = str(os.getuid())
+            self.gid = str(os.getgid())
+        self.config_dir = os.path.expanduser('~{0}/.dlenv'.format(self.user))
+        self.config_file = os.path.join(self.config_dir, 'config')
+        self.defaulttag_file = os.path.join(self.config_dir, 'defaulttag')
+
+        self._build_placeholder()
+        self.container_name = 'dlenv-{0}'.format(self.user)
+        with open(self.config_file) as f:
+            config = yaml.load(f, Loader=yaml.FullLoader)
+            self.home_volume = os.path.expanduser(config['home-volume']) \
+                               if 'home-volume' in config else None
+            self.container_name = config['container-name'] \
+                                  if 'container-name' in config \
+                                  else self.container_name
+        with open(self.defaulttag_file) as f:
+            lines = f.read().split('\n')
+            self.defaulttag = lines[0] if lines else None
+
+    def _build_placeholder(self):
+        if not os.path.isdir(self.config_dir):
+            self._makedir(self.config_dir)
+        if not os.path.exists(self.config_file):
+            self._touch(self.config_file,
+                        '# container-name: dlenv-{0}\n'
+                        '# home-volume: DIR_MOUNTED_ON_HOME_IN_CONTAINER\n'\
+                        .format(self.user))
+        if not os.path.exists(self.defaulttag_file):
+            self._touch(self.defaulttag_file)
+        
+            
+    def _makedir(self, path):
+        os.mkdir(path)
+        os.chown(path, int(self.uid), int(self.gid))
+
+    def _touch(self, path, contents=None):
+        with open(path, 'w') as f:
+            if contents:
+                f.write(contents)
+        os.chown(path, int(self.uid), int(self.gid))
+
+    def set_defaulttag(self, tag):
+        self.defaulttag = tag
+        self._touch(self.defaulttag_file, tag)
+
+
+def parse_args(userenv):
+    usage = "usage: %prog -h|--help\n"\
+            "       %prog [OPTIONS] COMMAND [ARGS]\n\n"\
+            "Specifically:\n"\
+            "  %prog [OPTIONS] list\n"\
+            "  %prog [OPTIONS] pull TAG...\n"\
+            "  %prog [OPTIONS] settag TAG\n"\
+            "  %prog [OPTIONS] run [COMMAND-ARGS-TO-RUN]\n\n"\
+            "Commands:\n"\
+            "  list       show executable tag list\n"\
+            "  pull       download docker images from docker hub\n"\
+            "  settag     set default tag to run\n"\
+            "  run        run container"
+    p = OptionParser(usage)
+
+    g = OptionGroup(p, 'LIST command options')
+    g.add_option('-H', '--hub',
+                 action='store_true', dest='from_hub',
+                 help='show list of tags registerd on DockerHub')
+    p.add_option_group(g)
+
+    g = OptionGroup(p, 'RUN command options')
+    g.add_option('-t', '--tag',
+                 action='store', dest='tag', metavar='TAG',
+                 help='tag name of docker image to run, default tag '
+                      'which is used when this option is not specified '
+                      'can be set by "settag" command')
+    g.add_option('-v', '--volume',
+                 action='store', dest='volume', metavar='DIR',
+                 help='path of directory which is mounted as home directory '
+                      'in container, this parameter can also be specified '
+                      'in ${HOME}/.dlenv/config')
+    g.add_option('-n', '--name',
+                 action='store', dest='name', metavar='NAME',
+                 help='name of container (default: dlenv), this parameter '
+                      'can also be specified in ${HOME}/.dlenv/config')
+    p.add_option_group(g)
+
+    options, args = p.parse_args()
+
+    if len(args) == 0:
+        p.error('no command is specified')
+        sys.exit(1)
+
+    options.command = args[0]
+    if options.command == 'list':
+        if len(args) > 1:
+            p.error('list command does not accept argment')
+            sys.exit(1)
+    elif options.command == 'pull':
+        if len(args) < 2:
+            p.error('at least one tag to download must be specified')
+            sys.exit(1)
+        options.tags_to_pull = args[1:]
+    elif options.command == 'settag':
+        if len(args) > 2:
+            p.error('only one tag must be specified as argument')
+            sys.exit(1)
+        options.defaulttag = args[1]
+    elif options.command == 'run':
+        if options.tag:
+            userenv.defaulttag = options.tag
+        if options.volume:
+            userenv.home_volume = options.volume
+        if options.name:
+            userenv.container_name = options.name
+        if not userenv.defaulttag:
+            p.error('no default tag is specified, '
+                    'specify default tag as "-t" option or in ~/dlevn/config')
+            sys.exit(1)
+        options.args_to_run = args[1:] if len(args) > 1 else None
+    else:
+        p.error('unsupported command "{0}" is specified'\
+                .format(options.command))
+        sys.exit(1)
+    
+    return options
+
+def _taglist_local():
+    cmd = ['docker', 'images', '--format', '{{.Tag}}', IMAGENAME]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    return filter(lambda x: x,  proc.stdout.read().split('\n'))
+
+def _taglist_global():
+    return []
+
+def do_list(userenv, options):
+    tags = sorted(_taglist_global() if options.from_hub else _taglist_local())
+    for tag in tags:
+        print('{0} {1}'.format('*' if tag == userenv.defaulttag else ' ',
+                               tag))
+
+def do_pull(userenv, options):
+    pass
+
+def do_settag(userenv, options):
+    userenv.set_defaulttag(options.defaulttag)
+
+def do_run(userenv, options):
+    cmd = ['docker', 'run', '--gpus', 'all', '-it', '--rm',
+           '--net', 'host', '--name', userenv.container_name,
+           '-e', 'LOCAL_USER={0}'.format(userenv.user),
+           '-e', 'LOCAL_UID={0}'.format(userenv.uid),
+           '-e', 'LOCAL_GID={0}'.format(userenv.gid)]
+    if 'DISPLAY' in os.environ:
+        cmd.append('-e')
+        cmd.append('DISPLAY={0}'.format(os.environ['DISPLAY']))
+    if userenv.home_volume:
+        cmd.append('-v')
+        cmd.append('{0}:/home/{1}'.format(userenv.home_volume, userenv.user))
+    xauth = os.path.expanduser(os.path.join(
+        '~{0}/.Xauthority'.format(userenv.user)))
+    if os.path.exists(xauth):
+        cmd.append('-v')
+        cmd.append('{0}:/home/{1}/.Xauthority'.format(xauth, userenv.user))
+    cmd.append('{0}:{1}'.format(IMAGENAME, userenv.defaulttag))
+    if options.args_to_run:
+        cmd += options.args_to_run
+    subprocess.call(cmd)
+
+if __name__ == '__main__':
+    userenv = UserEnv()
+    options = parse_args(userenv)
+    ops = {
+        'list': do_list,
+        'pull': do_pull,
+        'settag': do_settag,
+        'run': do_run,
+    }
+    ops[options.command](userenv, options)

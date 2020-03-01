@@ -145,7 +145,7 @@ if __name__ == '__main__':
         shutil.rmtree(DOCKERFILE_DIR)
         os.mkdir(DOCKERFILE_DIR)
         rule = MakeRule()
-        for tag in config:
+        for tag in sorted(config):
             instance = config[tag]
             if 'type' in instance :
                 envtype = instance['type']

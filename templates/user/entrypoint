@@ -4,10 +4,12 @@ GROUP_ID=${LOCAL_GID:-9001}
 USER_NAME=${LOCAL_USER:-user}
 CMD=${@:-/bin/bash}
 
-echo "Starting with:"
-echo "    USER : $USER_NAME"
-echo "    UID  : $USER_ID"
-echo "    GID  : $GROUP_ID"
+if [ "$CMD" == "/bin/bash" ];then
+    echo "Starting with:"
+    echo "    USER : $USER_NAME"
+    echo "    UID  : $USER_ID"
+    echo "    GID  : $GROUP_ID"
+fi
 if [ -d /home/"$USER_NAME" ];then
    useradd -u $USER_ID -o "$USER_NAME"
 else
@@ -19,4 +21,4 @@ echo "$USER_NAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 export HOME=/home/"$USER_NAME"
 cd "$HOME"
-exec /usr/sbin/gosu "$USER_NAME" "$CMD"
+exec /usr/sbin/gosu "$USER_NAME" $CMD

@@ -1,9 +1,9 @@
-allimages: c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9
-c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0:
-	docker build -t opiopan/dlenv-core:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0/core
-	docker build -t opiopan/dlenv-utils:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0/utils
-	docker build -t opiopan/dlenv:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0/user
+allimages: c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9 c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0
 c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9:
 	docker build -t opiopan/dlenv-core:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9/core
 	docker build -t opiopan/dlenv-utils:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9/utils
 	docker build -t opiopan/dlenv:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9/user
+c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0:
+	docker build -t opiopan/dlenv-core:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0/core
+	docker build -t opiopan/dlenv-utils:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0/utils
+	docker build -t opiopan/dlenv:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0 dockerfiles/c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0/user

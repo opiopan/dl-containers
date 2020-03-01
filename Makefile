@@ -1,4 +1,4 @@
-INSTALLDIR=/usr/local/bin
+INSTALLDIR	= /usr/local/bin
 
 default:
 	@echo "ERROR: At least one target of following must be specified."
@@ -19,5 +19,11 @@ list:
 
 dockerfiles:
 	@templates/gendockerfiles
+
+install:
+	install tools/dlenv $(INSTALLDIR)
+
+uninstall:
+	rm -f $(INSTALLDIR)/dlenv
 
 include dockerfiles/.buildrule
