@@ -38,7 +38,7 @@ ocX.X.X   | [OpenCV](https://opencv.org) version
 
 
 ## Building container images
-This step is not necessary since all images are published on [DockerHub](https://hub.docker.com/u/opiopan]).<br>
+This step is not necessary since all images are published on [DockerHub](https://hub.docker.com/u/opiopan).<br>
 If you have a reason that you don't wont to pull images from DockerHub, or you geranerate a your own Dockerfile as described steps below, buid images as following steps.
 
 ### In case of buiding a specific tag

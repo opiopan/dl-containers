@@ -5,6 +5,7 @@ import json
 from optparse import OptionParser, OptionGroup
 import yaml
 import subprocess
+import requests
 
 IMAGENAME='opiopan/dlenv'
 
@@ -120,7 +121,7 @@ def parse_args(userenv):
             sys.exit(1)
         options.tags_to_pull = args[1:]
     elif options.command == 'settag':
-        if len(args) > 2:
+        if len(args) != 2:
             p.error('only one tag must be specified as argument')
             sys.exit(1)
         options.defaulttag = args[1]
@@ -149,16 +150,27 @@ def _taglist_local():
     return filter(lambda x: x,  proc.stdout.read().split('\n'))
 
 def _taglist_global():
-    return []
+    url = 'https://registry.hub.docker.com/v2/repositories/{0}/tags/'\
+          .format(IMAGENAME)
+    while url:
+        resp = requests.get(url)
+        if resp.status_code != requests.codes.ok:
+            resp.raise_for_status()
+        data = resp.json()
+        for item in data['results']:
+            yield item['name']
+        url = data['next']
 
 def do_list(userenv, options):
-    tags = sorted(_taglist_global() if options.from_hub else _taglist_local())
+    tags = _taglist_global() if options.from_hub else sorted(_taglist_local())
     for tag in tags:
         print('{0} {1}'.format('*' if tag == userenv.defaulttag else ' ',
                                tag))
 
 def do_pull(userenv, options):
-    pass
+    for tag in options.tags_to_pull:
+        cmd = ['docker', 'pull', IMAGENAME + ':' + tag]
+        subprocess.call(cmd)
 
 def do_settag(userenv, options):
     userenv.set_defaulttag(options.defaulttag)
