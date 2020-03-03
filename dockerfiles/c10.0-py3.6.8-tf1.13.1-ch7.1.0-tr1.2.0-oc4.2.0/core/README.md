@@ -3,7 +3,7 @@ dlenv-core
 
 dlenv-core is a container image that contains several middlewares for deep learning.<br>
 This image is the base of [dlenv-utils](https://hub.docker.com/r/opiopan/dlenv-utils) containing additional tools, and the base of [dlenv](https://hub.docker.com/r/opiopan/dlenv) optimzed for non-root user using.<br>
-I strongly recommend you to use [dlenv](https://hub.docker.com/opiopan/dlenv) instead.
+I strongly recommend you to use [dlenv](https://hub.docker.com/r/opiopan/dlenv) instead.
 
 Dockerfile for this image is automaticaly generated from a template file and a rulefile. Refer [this github repository](https://github.com/opiopan/dl-containers) for details.
 

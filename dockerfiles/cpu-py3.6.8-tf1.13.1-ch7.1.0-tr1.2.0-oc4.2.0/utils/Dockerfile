@@ -1,9 +1,9 @@
-ARG BASECONTAINER="opiopan/dlenv-core:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9"
+ARG BASECONTAINER="opiopan/dlenv-core:cpu-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0"
 
 FROM ${BASECONTAINER}
 LABEL maintainer "opiopan@gmail.com"
 
-ARG OPENCV_VERSION="3.4.9"
+ARG OPENCV_VERSION="4.2.0"
 
 #-----------------------------------------------------
 # install essential and requiremented packages
@@ -65,13 +65,7 @@ RUN CORENUM=$(grep processor /proc/cpuinfo | wc -l) && \
         -DPYTHON_NUMPY_INCLUDE_DIR=${PYDIR}/lib/python${PYMVER}/site-packages/numpy/core/include \
         -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules \
         -DWITH_1394=OFF -DWITH_GSTREAMER=ON -DWITH_FFMPEG=OFF \
-        -D WITH_CUDA=ON \
         -D ENABLE_FAST_MATH=ON \
-        -D CUDA_FAST_MATH=ON \
-        -D WITH_CUBLAS=ON \
-        -D WITH_NVCUVID=OFF \
-        -D OPENCV_DNN_CUDA=ON \
-        -D BUILD_opencv_cudaimgproc=OFF \
 	__OPENCV_ADDITIONAL_OPTIONS__ \
         ../opencv && \
     make -j ${CORENUM} && \

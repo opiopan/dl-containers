@@ -1,15 +1,13 @@
-ARG BASECONTAINER="nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04"
+ARG BASECONTAINER="ubuntu:18.04"
 
 FROM ${BASECONTAINER}
 LABEL maintainer "opiopan@gmail.com"
 
 ARG PYTHON_VERSION="3.6.8"
 ARG TF_VERSION="==1.13.1"
-ARG CUPY_PKG="cupy-cuda100"
-ARG CUPY_VERSION="==7.1.1"
 ARG CHAINER_VERSION="==7.1.0"
-ARG PYTORCH_VERSION="==1.2.0"
-ARG TORCHVISION_VERSION="==0.4.0"
+ARG PYTORCH_VERSION="==1.2.0+cpu"
+ARG TORCHVISION_VERSION="==0.4.0+cpu"
 ARG PYTORCH_WHLLIST="https://download.pytorch.org/whl/torch_stable.html"
 ARG PILLOW_VERSION="==6.2.1"
 
@@ -22,6 +20,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     	curl \
 	git \
+	build-essential \
+	ca-certificates \
 	libffi-dev \
 	libssl-dev \
 	zlib1g-dev \
@@ -42,21 +42,15 @@ ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv install ${PYTHON_VERSION} && \
     pyenv global ${PYTHON_VERSION} && \
     pyenv rehash && \
-    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --upgrade pip &&\
     pip install --no-cache-dir setuptools
 
 #-----------------------------------------------------
 # install Tensorfolow & Keras
 #-----------------------------------------------------
 RUN pip install --no-cache-dir \
-    tensorflow-gpu${TF_VERSION} \
+    tensorflow${TF_VERSION} \
     keras
-ENV TF_FORCE_GPU_ALLOW_GROWTH=true
-
-#-----------------------------------------------------
-# install CuPy
-#-----------------------------------------------------
-RUN pip install --no-cache-dir ${CUPY_PKG}${CUPY_VERSION}
 
 #-----------------------------------------------------
 # install Chainer

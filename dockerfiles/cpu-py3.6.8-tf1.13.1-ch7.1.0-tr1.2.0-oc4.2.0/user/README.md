@@ -1,16 +1,13 @@
-dlenv-core
+dlenv
 ====
 
-dlenv-core is a container image that contains several middlewares for deep learning.<br>
-This image is the base of [dlenv-utils](https://hub.docker.com/r/opiopan/dlenv-utils) containing additional tools, and the base of [dlenv](https://hub.docker.com/r/opiopan/dlenv) optimzed for non-root user using.<br>
-I strongly recommend you to use [dlenv](https://hub.docker.com/r/opiopan/dlenv) instead.
-
+dlenv is a container image that contains several middleware for deep learning.<br>
 Dockerfile for this image is automaticaly generated from a template file and a rulefile. Refer [this github repository](https://github.com/opiopan/dl-containers) for details.
 
 ## Tag Naming Convention
 There are many tools and middlewares for deep learning in the workld, and they are updated without backword compatibility sometimes.
 This is the major motivation to use container for deep learning environment.<br>
-dlenv-core provides several variation of images as combination of some version of each tool and middleware.
+dlenv-utils provides several variation of images as combination of some version of each tool and middleware.
 Tag name of each image is very long since tag indicates version of each tool and middleware.<br>
 In this section, naming rule for tag is explained.
 
@@ -36,3 +33,18 @@ chX.X.X   | [Chainer](https://chainer.org) version
 trX.X.X   | [PyTorch](https://pytorch.org) version
 ocX.X.X   | [OpenCV](https://opencv.org) version
 
+## Running container
+[dl-containers](https://github.com/opiopan/dl-containers) provides useful tool to run this image.
+I strongly recomend use this tool instead of ```docker``` command or docker-compose.
+
+If you run this image directly using ```docker``` command, a couple of environment variable are specified. Following is a example to run container.
+
+```
+docker run --gpus all -it --rm --net host \
+       -e DISPLAY=$DISPLAY \
+       -v HOSTDIR:/home/USERNAME \
+       -v $HOME/.Xauthority:/home/USERNAME/.Xauthority \
+       -e LOCAL_USER=USERNAME -e LOCAL_UID=`id -u USERNAME` \
+       -e LOCAL_GID=`id -g USERNAME` \
+       opiopan/dlenv:TAGNAME
+```

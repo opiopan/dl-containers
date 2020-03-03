@@ -27,7 +27,7 @@ RUN apt-get update && \
 	zlib1g-dev \
 	liblzma-dev \
 	libbz2-dev libreadline-dev libsqlite3-dev \
-	python3-tk tk-dev
+	tk-dev
 ENV DEBIAN_FRONTEND=
 
 #-----------------------------------------------------
@@ -42,13 +42,13 @@ ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv install ${PYTHON_VERSION} && \
     pyenv global ${PYTHON_VERSION} && \
     pyenv rehash && \
-    pip install --upgrade pip && \
+    pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir setuptools
 
 #-----------------------------------------------------
 # install Tensorfolow & Keras
 #-----------------------------------------------------
-RUN pip3 install --no-cache-dir \
+RUN pip install --no-cache-dir \
     tensorflow-gpu${TF_VERSION} \
     keras
 ENV TF_FORCE_GPU_ALLOW_GROWTH=true

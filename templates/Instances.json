@@ -55,10 +55,10 @@
 	"tensorflow": {"version": "1.13.1"},
 	"chainer": {"version": "7.1.0"},
 	"pytorch": {
-	    "version": "1.2.0",
+	    "version": "1.2.0+cpu",
 	    "whl-list": "https://download.pytorch.org/whl/torch_stable.html"
 	},
-	"torchvision": {"version": "0.4.0"},
+	"torchvision": {"version": "0.4.0+cpu"},
 	"pillow": {"version": "6.2.1"},
 	"opencv":{"version": "4.2.0"}
     }

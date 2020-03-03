@@ -84,6 +84,20 @@ def m4options_cuda(config):
     
     return base, opts
 
+def m4options_cpu(config):
+    element = None
+    base = None
+    opts = m4options_common(config)
+    try:
+        element = 'ubuntu-container/version'
+        ubuntu_ver = config['ubuntu-container']['version']
+        base = 'ubuntu:{0}'.format(ubuntu_ver)
+        
+    except:
+        raise Exception('no {0} definition'.format(element))
+    
+    return base, opts
+
 def m4run(opts, in_file, out_file):
     cmds = ['m4', '-P', '-G'] + opts + [in_file]
     with open(out_file, 'w') as f:
@@ -151,6 +165,11 @@ def print_done_msg(name, errmsg=None):
     print('{0} : {1}{2}{3}'.format(tag, BEGINC, msg, ENDC))
 
 if __name__ == '__main__':
+    gen_m4options = {
+        'cuda': m4options_cuda,
+        'cpu': m4options_cpu,
+    }
+    
     with open(CONFIG_FILE) as f:
         config = json.load(f)
         shutil.rmtree(DOCKERFILE_DIR)
@@ -161,8 +180,8 @@ if __name__ == '__main__':
             if 'type' in instance :
                 envtype = instance['type']
                 try:
-                    if envtype == 'cuda':
-                        base, opts = m4options_cuda(instance)
+                    if envtype in gen_m4options:
+                        base, opts = gen_m4options[envtype](instance)
                         err = gen_dockerfile(tag, envtype, base, opts)
                         rule.add_tag(tag)
                         print_done_msg(tag)

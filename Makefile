@@ -9,6 +9,7 @@ default:
 	@echo "    dockerfiles   generate Dockerfiles from template"
 	@echo "    install       install a assistance tool to run container"
 	@echo "    uninstall     uninstall a assistance tool to run container"
+	@echo "    push          push all docker images to DockerHub"
 	@echo
 	@false
 
@@ -25,5 +26,18 @@ install:
 
 uninstall:
 	rm -f $(INSTALLDIR)/dlenv
+
+push:
+	docker push opiopan/dlenv-core
+	docker push opiopan/dlenv-utils
+	docker push opiopan/dlenv
+
+clean-dungling-image:
+	@docker images -q --filter dangling=true | while read IID; do \
+	    docker ps -aq --filter ancestor=$$IID | while read PID; do \
+	        docker rm $$PID; \
+	    done; \
+	    docker rmi $$IID; \
+	done
 
 include dockerfiles/.buildrule
