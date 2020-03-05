@@ -61,5 +61,20 @@
 	"torchvision": {"version": "0.4.0+cpu"},
 	"pillow": {"version": "6.2.1"},
 	"opencv":{"version": "4.2.0"}
+    },
+    
+    "cpu-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9": {
+	"type": "cpu",
+	"ubuntu-container":{"version": "18.04"},
+	"python": {"version": "3.6.8"},
+	"tensorflow": {"version": "1.13.1"},
+	"chainer": {"version": "7.1.0"},
+	"pytorch": {
+	    "version": "1.2.0+cpu",
+	    "whl-list": "https://download.pytorch.org/whl/torch_stable.html"
+	},
+	"torchvision": {"version": "0.4.0+cpu"},
+	"pillow": {"version": "6.2.1"},
+	"opencv":{"version": "3.4.9"}
     }
 }
