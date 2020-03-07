@@ -6,6 +6,8 @@ from optparse import OptionParser, OptionGroup
 import yaml
 import subprocess
 import requests
+if sys.version_info.major != 2:
+    from functools import cmp_to_key
 
 IMAGENAME='opiopan/dlenv'
 
@@ -147,7 +149,11 @@ def parse_args(userenv):
 def _taglist_local():
     cmd = ['docker', 'images', '--format', '{{.Tag}}', IMAGENAME]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    return filter(lambda x: x,  proc.stdout.read().split('\n'))
+    if sys.version_info.major != 2:
+        return filter(lambda x: x,
+                      proc.stdout.read().decode('utf-8').split('\n'))
+    else:
+        return filter(lambda x: x,  proc.stdout.read().split('\n'))
 
 def _taglist_global():
     url = 'https://registry.hub.docker.com/v2/repositories/{0}/tags/'\
@@ -162,7 +168,48 @@ def _taglist_global():
         url = data['next']
 
 def do_list(userenv, options):
-    tags = _taglist_global() if options.from_hub else sorted(_taglist_local())
+    def cmp_tag(a, b):
+        def curval(string, idx):
+            if sys.version_info.major != 2:
+                def isnum(s):
+                    return s.isnumeric()
+            else:
+                def isnum(s):
+                    return unicode(s).isnumeric()
+                
+            if idx >= len(string):
+                return None, idx
+            num = 0
+            nidx = idx
+            while isnum(string[nidx]):
+                num = num * 10 +  int(string[nidx])
+                nidx += 1
+            if nidx > idx:
+                return num, nidx
+            else:
+                return string[idx], idx + 1
+        vala, idxa = curval(a, 0)
+        valb, idxb = curval(b, 0)
+        while True:
+            if vala is None:
+                return -1 if valb is None else 1
+            elif valb is None:
+                return -1
+            elif type(vala) != type(valb):
+                return 1 if type(vala) == int else -1
+            elif vala < valb:
+                return -1
+            elif vala > valb:
+                return 1
+            else:
+                vala, idxa = curval(a, idxa)
+                valb, idxb = curval(b, idxb)
+    
+    tags = _taglist_global() if options.from_hub else _taglist_local()
+    if sys.version_info.major != 2:
+        tags = sorted(tags, key=cmp_to_key(cmp_tag))
+    else:
+        tags = sorted(tags, cmp=cmp_tag)
     for tag in tags:
         print('{0} {1}'.format('*' if tag == userenv.defaulttag else ' ',
                                tag))

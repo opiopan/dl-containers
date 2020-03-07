@@ -51,7 +51,7 @@ $ make list
 Then, execute ```make``` with tag name that you want to build.
 
 ```shell
-$ make TAG-NAME
+$ sudo make TAG-NAME
 ```
 
 ### In case of buiding all tags
@@ -59,7 +59,7 @@ You can also build all buildable tags at once.
 In this case, specify ```allimages``` as a target.
 
 ```shell
-$ make allimages
+$ sudo make allimages
 ```
 
 ## Running container using helper tool
@@ -87,7 +87,7 @@ home-volume: ~/dl-data
 You can set a default tag to run by ```dlenv settag``` command.
 
 ```shell
-$ dlenv list --hub
+$ dlenv --hub list
   c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc3.4.9
   c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0
 
