@@ -29,6 +29,7 @@ RUN apt-get install -y --no-install-recommends \
 RUN apt-get install -y --no-install-recommends \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 
+
 #-----------------------------------------------------
 # install opencv
 #-----------------------------------------------------

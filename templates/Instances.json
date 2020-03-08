@@ -47,6 +47,30 @@
 	"pillow": {"version": "6.2.1"},
 	"opencv":{"version": "3.4.9"}
     },
+
+    "c9.0-py3.6.8-tf1.8.0-ch6.6.0-tr1.0.0-oc3.3.1": {
+	"type": "cuda",
+	"cuda-container":{
+	    "cuda-version": "9.0",
+	    "cudnn-version": "7",
+	    "ubuntu-version": "16.04"
+	},
+	"python": {"version": "3.6.8"},
+	"tensorflow": {"version": "1.8.0"},
+	"cupy": {
+	    "package": "cupy-cuda90",
+	    "version": "6.6.0"
+	},
+	"chainer": {"version": "6.6.0"},
+	"pytorch": {
+	    "version": "1.0.0",
+	    "whl-list": "https://download.pytorch.org/whl/cu90/torch_stable.html"
+	},
+	"torchvision": {"version": "0.2.1"},
+	"pillow": {"version": "6.2.1"},
+	"gstreamer": {"version": "1.14.5"},
+	"opencv":{"version": "3.3.1"}
+    },
     
     "cpu-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0": {
 	"type": "cpu",
@@ -76,5 +100,21 @@
 	"torchvision": {"version": "0.4.0+cpu"},
 	"pillow": {"version": "6.2.1"},
 	"opencv":{"version": "3.4.9"}
+    },
+
+    "cpu-py3.6.8-tf1.8.0-ch6.6.0-tr1.0.0-oc3.3.1": {
+	"type": "cpu",
+	"ubuntu-container":{"version": "16.04"},
+	"python": {"version": "3.6.8"},
+	"tensorflow": {"version": "1.8.0"},
+	"chainer": {"version": "6.6.0"},
+	"pytorch": {
+	    "version": "1.0.0",
+	    "whl-list": "https://download.pytorch.org/whl/cu90/torch_stable.html"
+	},
+	"torchvision": {"version": "0.2.1"},
+	"pillow": {"version": "6.2.1"},
+	"gstreamer": {"version": "1.14.5"},
+	"opencv":{"version": "3.3.1"}
     }
 }

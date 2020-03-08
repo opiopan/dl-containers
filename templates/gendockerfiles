@@ -53,6 +53,12 @@ def m4options_common(config):
         if 'options' in config['opencv']:
             opts.append('-D__OPENCV_ADDITIONAL_OPTIONS__=' + \
                         config['opencv']['options'])
+        if 'gstreamer' in config:
+            element = 'gstreamer/version'
+            opts.append('-D__GSTREAMER_VERSION__='+ \
+                        config['gstreamer']['version'])
+        else:
+            opts.append('-D__GSTREAMER_VERSION__')
 
     except:
         raise Exception('no {0} definition'.format(element))
@@ -74,6 +80,7 @@ def m4options_cuda(config):
         ubuntu_ver = container[element]
         base = 'nvidia/cuda:{0}-cudnn{1}-devel-ubuntu{2}'.\
                format(cuda_ver, cudnn_ver, ubuntu_ver)
+        opts.append('-Itemplates/include/inc-' + ubuntu_ver)
         element = 'cupy/package'
         opts.append('-D__CUPY_PKG__=' + config['cupy']['package'])
         element = 'cupy/version'
@@ -92,6 +99,7 @@ def m4options_cpu(config):
         element = 'ubuntu-container/version'
         ubuntu_ver = config['ubuntu-container']['version']
         base = 'ubuntu:{0}'.format(ubuntu_ver)
+        opts.append('-Itemplates/include/inc-' + ubuntu_ver)
         
     except:
         raise Exception('no {0} definition'.format(element))
@@ -99,7 +107,7 @@ def m4options_cpu(config):
     return base, opts
 
 def m4run(opts, in_file, out_file):
-    cmds = ['m4', '-P', '-G'] + opts + [in_file]
+    cmds = ['m4', '-P'] + opts + [in_file]
     with open(out_file, 'w') as f:
         subprocess.call(cmds, stdout=f)
 
