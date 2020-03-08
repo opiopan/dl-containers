@@ -4,6 +4,7 @@ FROM ${BASECONTAINER}
 LABEL maintainer "opiopan@gmail.com"
 
 ARG PYTHON_VERSION="__PYTHON_VERSION__"
+ARG NUMPY_VERSION="__NUMPY_VERSION__"
 ARG TF_VERSION="__TF_VERSION__"
 ARG CHAINER_VERSION="__CHAINER_VERSION__"
 ARG PYTORCH_VERSION="__PYTORCH_VERSION__"
@@ -49,6 +50,7 @@ RUN pyenv install ${PYTHON_VERSION} && \
 # install Tensorfolow & Keras
 #-----------------------------------------------------
 RUN pip install --no-cache-dir \
+    numpy${NUMPY_VERSION} \
     tensorflow${TF_VERSION} \
     keras
 
@@ -68,9 +70,10 @@ RUN pip install --no-cache-dir Pillow${PILLOW_VERSION} && \
 #-----------------------------------------------------
 # install essential python libs for ML
 #-----------------------------------------------------
+ARG MATPLOTLIB_VERSION="__MATPLOTLIB_VERSION__"
 RUN pip install --no-cache-dir \
     	Pillow \
-	matplotlib \
+	matplotlib${MATPLOTLIB_VERSION} \
 	tqdm \
 	h5py \
 	kaggle-cli \

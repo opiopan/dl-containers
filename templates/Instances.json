@@ -7,6 +7,8 @@
 	    "ubuntu-version": "18.04"
 	},
 	"python": {"version": "3.6.8"},
+	"numpy" : {"version": "1.16.6"},
+	"matplotlib" : {"version": "3.1.3"},
 	"tensorflow": {"version": "1.13.1"},
 	"cupy": {
 	    "package": "cupy-cuda100",
@@ -33,6 +35,8 @@
 	    "ubuntu-version": "18.04"
 	},
 	"python": {"version": "3.6.8"},
+	"numpy" : {"version": "1.16.6"},
+	"matplotlib" : {"version": "3.1.3"},
 	"tensorflow": {"version": "1.13.1"},
 	"cupy": {
 	    "package": "cupy-cuda100",
@@ -56,6 +60,8 @@
 	    "ubuntu-version": "16.04"
 	},
 	"python": {"version": "3.6.8"},
+	"numpy" : {"version": "1.16.6"},
+	"matplotlib" : {"version": "3.1.3"},
 	"tensorflow": {"version": "1.8.0"},
 	"cupy": {
 	    "package": "cupy-cuda90",
@@ -76,6 +82,8 @@
 	"type": "cpu",
 	"ubuntu-container":{"version": "18.04"},
 	"python": {"version": "3.6.8"},
+	"numpy" : {"version": "1.16.6"},
+	"matplotlib" : {"version": "3.1.3"},
 	"tensorflow": {"version": "1.13.1"},
 	"chainer": {"version": "7.1.0"},
 	"pytorch": {
@@ -91,6 +99,8 @@
 	"type": "cpu",
 	"ubuntu-container":{"version": "18.04"},
 	"python": {"version": "3.6.8"},
+	"numpy" : {"version": "1.16.6"},
+	"matplotlib" : {"version": "3.1.3"},
 	"tensorflow": {"version": "1.13.1"},
 	"chainer": {"version": "7.1.0"},
 	"pytorch": {
@@ -106,6 +116,8 @@
 	"type": "cpu",
 	"ubuntu-container":{"version": "16.04"},
 	"python": {"version": "3.6.8"},
+	"numpy" : {"version": "1.16.6"},
+	"matplotlib" : {"version": "3.1.3"},
 	"tensorflow": {"version": "1.8.0"},
 	"chainer": {"version": "6.6.0"},
 	"pytorch": {

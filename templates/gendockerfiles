@@ -59,6 +59,18 @@ def m4options_common(config):
                         config['gstreamer']['version'])
         else:
             opts.append('-D__GSTREAMER_VERSION__')
+        if 'numpy' in config:
+            element = 'numpy/version'
+            opts.append('-D__NUMPY_VERSION__==='+ \
+                        config['numpy']['version'])
+        else:
+            opts.append('-D__NUMPY_VERSION__')            
+        if 'matplotlib' in config:
+            element = 'matplotlib/version'
+            opts.append('-D__MATPLOTLIB_VERSION__==='+ \
+                        config['matplotlib']['version'])
+        else:
+            opts.append('-D__MATPLOTLIB_VERSION__')            
 
     except:
         raise Exception('no {0} definition'.format(element))
