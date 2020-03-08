@@ -33,9 +33,9 @@ class UserEnv:
         with open(self.config_file) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
             self.home_volume = os.path.expanduser(config['home-volume']) \
-                               if 'home-volume' in config else None
+                               if config and 'home-volume' in config else None
             self.container_name = config['container-name'] \
-                                  if 'container-name' in config \
+                                  if config and 'container-name' in config \
                                   else self.container_name
         with open(self.defaulttag_file) as f:
             lines = f.read().split('\n')
