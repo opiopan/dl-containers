@@ -1,0 +1,30 @@
+#!/bin/bash
+USER_ID=${LOCAL_UID:-9001}
+GROUP_ID=${LOCAL_GID:-9001}
+USER_NAME=${LOCAL_USER:-user}
+CMD=${@:-/bin/bash}
+
+if [ "$CMD" == "/bin/bash" ];then
+    printf '\033[96m'
+    echo "Starting with: $USER_NAME ($USER_ID:$GROUP_ID)"
+    cat /boot/version
+    printf '\033[0m\n'
+fi
+if [ -d /home/"$USER_NAME" ];then
+   useradd -u $USER_ID -o "$USER_NAME"
+else
+   useradd -u $USER_ID -o -m "$USER_NAME"
+fi
+groupmod -g $GROUP_ID "$USER_NAME"
+
+echo "$USER_NAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+export HOME=/home/"$USER_NAME"
+
+if ! [ -f "$HOME/.bashrc" ];then
+    echo PS1="'"'${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u@dlenv.\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '"'"> "$HOME/.bashrc"
+    chown "$USER_NAME" "$HOME/.bashrc"
+fi
+
+cd "$HOME"
+exec /usr/sbin/gosu "$USER_NAME" $CMD

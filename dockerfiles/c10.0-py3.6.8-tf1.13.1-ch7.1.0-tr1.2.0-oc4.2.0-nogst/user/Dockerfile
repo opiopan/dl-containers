@@ -1,4 +1,4 @@
-ARG BASECONTAINER="__BASECONTAINER__"
+ARG BASECONTAINER="opiopan/dlenv-utils:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0-nogst"
 
 FROM ${BASECONTAINER}
 LABEL maintainer "opiopan@gmail.com"
@@ -22,7 +22,7 @@ RUN echo "    Ubuntu      : "$(grep VERSION_ID /etc/os-release | cut -d'"' -f2) 
 	echo "    cuDNN       : $CUDNN_VERSION" >> /boot/version;\
     fi;\
     echo "    Python      : $(pyenv version | cut -d' ' -f1)" >> /boot/version;\
-    echo "    TensorFlow  : "$(echo __TF_VERSION__ | sed -e 's/=//g') >>/boot/version;\
+    echo "    TensorFlow  : "$(echo ==1.13.1 | sed -e 's/=//g') >>/boot/version;\
     echo "    Chainer     : "$(python -c 'import chainer; print(chainer.__version__)') >>/boot/version;\
     echo "    PyTorch     : "$(python -c 'import torch; print(torch.__version__)') >>/boot/version;\
     echo "    TorchVision : "$(python -c 'import torchvision; print(torchvision.__version__)') >>/boot/version;\

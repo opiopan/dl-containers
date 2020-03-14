@@ -187,6 +187,7 @@ def print_done_msg(name, errmsg=None):
 if __name__ == '__main__':
     gen_m4options = {
         'cuda': m4options_cuda,
+        'cuda-nogst': m4options_cuda,
         'cpu': m4options_cpu,
     }
     

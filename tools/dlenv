@@ -182,7 +182,7 @@ def do_list(userenv, options):
                 return None, idx
             num = 0
             nidx = idx
-            while isnum(string[nidx]):
+            while nidx < len(string) and isnum(string[nidx]):
                 num = num * 10 +  int(string[nidx])
                 nidx += 1
             if nidx > idx:
@@ -234,7 +234,7 @@ def do_run(userenv, options):
         cmd.append('all')
     for dev in glob.glob('/dev/video[0-9]*'):
         cmd.append('--device')
-        cmd.append('{0}:{0}:mwr'.format(dev))
+        cmd.append('{0}:{0}'.format(dev))
     if 'DISPLAY' in os.environ:
         cmd.append('-e')
         cmd.append('DISPLAY={0}'.format(os.environ['DISPLAY']))

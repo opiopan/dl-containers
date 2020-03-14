@@ -26,7 +26,7 @@ RUN echo "    Ubuntu      : "$(grep VERSION_ID /etc/os-release | cut -d'"' -f2) 
     echo "    Chainer     : "$(python -c 'import chainer; print(chainer.__version__)') >>/boot/version;\
     echo "    PyTorch     : "$(python -c 'import torch; print(torch.__version__)') >>/boot/version;\
     echo "    TorchVision : "$(python -c 'import torchvision; print(torchvision.__version__)') >>/boot/version;\
-    echo "    GStreamer   : "$(gst-inspect-1.0 --version | grep GStreamer | cut -d' ' -f2) >>/boot/version;\
+    if type gst-inspect-1.0; then echo "    GStreamer   : "$(gst-inspect-1.0 --version | grep GStreamer | cut -d' ' -f2) >>/boot/version; fi;\
     echo "    OpenCV      : "$(opencv_version) >>/boot/version
 
 ENTRYPOINT ["/boot/entrypoint"]

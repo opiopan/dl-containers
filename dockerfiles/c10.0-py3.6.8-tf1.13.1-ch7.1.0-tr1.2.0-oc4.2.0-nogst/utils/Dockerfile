@@ -1,0 +1,86 @@
+ARG BASECONTAINER="opiopan/dlenv-core:c10.0-py3.6.8-tf1.13.1-ch7.1.0-tr1.2.0-oc4.2.0-nogst"
+
+FROM ${BASECONTAINER}
+LABEL maintainer "opiopan@gmail.com"
+
+ARG OPENCV_VERSION="4.2.0"
+
+#-----------------------------------------------------
+# install essential and requiremented packages
+#-----------------------------------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+    vim less imagemagick ssh wget\
+    cmake libgtk2.0-dev pkg-config libavcodec-dev \
+    libavformat-dev libswscale-dev \
+    libtbb2 libtbb-dev \
+    libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev \
+    ffmpeg
+
+#-----------------------------------------------------
+# install opencv
+#-----------------------------------------------------
+RUN mkdir /opencv
+RUN CORENUM=$(grep processor /proc/cpuinfo | wc -l) && \
+    PYVER=$(cat /.pyenv/version) && \
+    PYDIR=/.pyenv/versions/${PYVER} && \
+    PYMVER=$(echo $PYVER | sed 's/[.\-]/ /g' | \
+                while read a b c; do echo $a.$b;done) && \
+    cd /opencv && \
+    git clone --depth=1 -b ${OPENCV_VERSION} --single-branch \
+    	git://github.com/opencv/opencv.git && \
+    git clone --depth=1 -b ${OPENCV_VERSION} --single-branch \
+    	git://github.com/opencv/opencv_contrib && \
+    mkdir build && \
+    cd build && \
+    cmake \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+	-DOPENCV_GENERATE_PKGCONFIG=ON \
+	-DBUILD_EXAMPLES=ON \
+        -DINSTALL_C_EXAMPLES=ON \
+        -DBUILD_NEW_PYTHON_SUPPORT=ON \
+        -DBUILD_opencv_python3=ON \
+        -DBUILD_opencv_legacy=OFF \
+        -DINSTALL_PYTHON_EXAMPLES=ON \
+        -DPYTHON_EXECUTABLE=${PYDIR}/bin/python \
+        -DPYTHON_LIBRARY=${PYDIR}/lib/libpython${PYMVER}m.a \
+        -DPYTHON_INCLUDE_DIR=${PYDIR}/include/python${PYMVER}m \
+        -DPYTHON_INCLUDE_DIRS=${PYDIR}/include/python${PYMVER}m \
+        -DPYTHON_INCLUDE_DIRS2=${PYDIR}/include/python${PYMVER}m \
+        -DINCLUDE_DIRS=${PYDIR}/include/python${PYMVER}m \
+        -DINCLUDE_DIRS2=${PYDIR}/include/python${PYMVER}m \
+        -DPYTHON_PACKAGES_PATH=${PYDIR}/lib/python${PYMVER}/site-packages \
+        -DPYTHON_NUMPY_INCLUDE_DIR=${PYDIR}/lib/python${PYMVER}/site-packages/numpy/core/include \
+        -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules \
+        -D WITH_CUDA=ON \
+        -D ENABLE_FAST_MATH=ON \
+        -D CUDA_FAST_MATH=ON \
+        -D WITH_CUBLAS=ON \
+        -D WITH_NVCUVID=OFF \
+        -D OPENCV_DNN_CUDA=ON \
+        -D BUILD_opencv_cudaimgproc=OFF \
+	-DCUDA_ARCH_BIN='6.0 6.1 7.0 7.5' -DCUDA_ARCH_PTX='6.0 6.1 7.0 7.5' \
+        ../opencv && \
+    make -j ${CORENUM} && \
+    make install && \
+    ln -s /usr/local/lib/python${PYMVER}/site-packages/cv2/ \
+          /.pyenv/versions/${PYVER}/lib/python${PYMVER}/site-packages && \
+    cd / && rm -rf opencv
+
+#-----------------------------------------------------
+# install additional python libraries
+#-----------------------------------------------------
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir \
+    ipython scipy sympy jupyter
+
+#-----------------------------------------------------
+# install additional packages
+#-----------------------------------------------------
+RUN apt-get install -y --no-install-recommends \
+    v4l-utils
+
+#-----------------------------------------------------
+# clean up
+#-----------------------------------------------------
+RUN apt-get clean
