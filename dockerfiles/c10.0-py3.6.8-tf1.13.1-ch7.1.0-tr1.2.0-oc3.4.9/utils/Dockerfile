@@ -89,6 +89,12 @@ RUN pip install --upgrade pip && \
     ipython scipy sympy jupyter
 
 #-----------------------------------------------------
+# install additional packages
+#-----------------------------------------------------
+RUN apt-get install -y --no-install-recommends \
+    v4l-utils
+
+#-----------------------------------------------------
 # clean up
 #-----------------------------------------------------
 RUN apt-get clean

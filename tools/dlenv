@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import os
+import glob
 import json
 from optparse import OptionParser, OptionGroup
 import yaml
@@ -33,9 +34,9 @@ class UserEnv:
         with open(self.config_file) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
             self.home_volume = os.path.expanduser(config['home-volume']) \
-                               if config and 'home-volume' in config else None
+                               if 'home-volume' in config else None
             self.container_name = config['container-name'] \
-                                  if config and 'container-name' in config \
+                                  if 'container-name' in config \
                                   else self.container_name
         with open(self.defaulttag_file) as f:
             lines = f.read().split('\n')
@@ -223,11 +224,17 @@ def do_settag(userenv, options):
     userenv.set_defaulttag(options.defaulttag)
 
 def do_run(userenv, options):
-    cmd = ['docker', 'run', '--gpus', 'all', '-it', '--rm',
+    cmd = ['docker', 'run', '-it', '--rm',
            '--net', 'host', '--name', userenv.container_name,
            '-e', 'LOCAL_USER={0}'.format(userenv.user),
            '-e', 'LOCAL_UID={0}'.format(userenv.uid),
            '-e', 'LOCAL_GID={0}'.format(userenv.gid)]
+    if os.path.exists('/proc/driver/nvidia/version'):
+        cmd.append('--gpus')
+        cmd.append('all')
+    for dev in glob.glob('/dev/video[0-9]*'):
+        cmd.append('--device')
+        cmd.append('{0}:{0}:mwr'.format(dev))
     if 'DISPLAY' in os.environ:
         cmd.append('-e')
         cmd.append('DISPLAY={0}'.format(os.environ['DISPLAY']))
