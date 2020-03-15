@@ -169,13 +169,13 @@ RUN CORENUM=$(grep processor /proc/cpuinfo | wc -l) && \
 #-----------------------------------------------------
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir \
-    ipython scipy sympy jupyter
+    ipython scipy sympy jupyter labelImg
 
 #-----------------------------------------------------
 # install additional packages
 #-----------------------------------------------------
 RUN apt-get install -y --no-install-recommends \
-    v4l-utils
+    v4l-utils qt5-default
 
 #-----------------------------------------------------
 # clean up

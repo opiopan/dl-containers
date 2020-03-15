@@ -74,7 +74,7 @@ def parse_args(userenv):
             "       %prog [OPTIONS] COMMAND [ARGS]\n\n"\
             "Specifically:\n"\
             "  %prog [OPTIONS] list\n"\
-            "  %prog [OPTIONS] pull TAG...\n"\
+            "  %prog [OPTIONS] pull TAG...|--all\n"\
             "  %prog [OPTIONS] settag TAG\n"\
             "  %prog [OPTIONS] run [COMMAND-ARGS-TO-RUN]\n\n"\
             "Commands:\n"\
@@ -88,6 +88,12 @@ def parse_args(userenv):
     g.add_option('-H', '--hub',
                  action='store_true', dest='from_hub',
                  help='show list of tags registerd on DockerHub')
+    p.add_option_group(g)
+
+    g = OptionGroup(p, 'PULL command options')
+    g.add_option('-A', '--all',
+                 action='store_true', dest='all_tags',
+                 help='pull all images from DockerHub')
     p.add_option_group(g)
 
     g = OptionGroup(p, 'RUN command options')
@@ -119,10 +125,12 @@ def parse_args(userenv):
             p.error('list command does not accept argment')
             sys.exit(1)
     elif options.command == 'pull':
-        if len(args) < 2:
+        if len(args) < 2 and not options.all_tags:
             p.error('at least one tag to download must be specified')
             sys.exit(1)
-        options.tags_to_pull = args[1:]
+        options.tags_to_pull = args[1:] \
+                               if not options.all_tags \
+                                  else _taglist_global()
     elif options.command == 'settag':
         if len(args) != 2:
             p.error('only one tag must be specified as argument')
